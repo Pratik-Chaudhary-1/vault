@@ -3,8 +3,9 @@ import { PrismaClient } from "@prisma/client";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { authenticateToken } from "../middleware/auth.js";
-import { config } from "../config/config.js";
+import jwt from "jsonwebtoken";
+import { authenticateToken } from "../middleware.js";
+import { config } from "../config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -143,8 +144,7 @@ router.get("/files/:id/download", async (req, res) => {
 
       if (token) {
         try {
-          const jwt = await import("jsonwebtoken");
-          const user = jwt.default.verify(token, config.jwtSecret);
+          const user = jwt.verify(token, config.jwtSecret);
           if (file.uploadedBy !== user.id) {
             return res.status(403).json({ error: "Access denied" });
           }

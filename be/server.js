@@ -1,7 +1,12 @@
 import express from "express";
 import cors from "cors";
 import fileUpload from "express-fileupload";
-import { config } from "dotenv";
+import dotenv from "dotenv";
+import { config } from "./config.js";
+import authRoutes from "./routes/auth.js";
+import fileRoutes from "./routes/files.js";
+
+dotenv.config();
 
 const app = express();
 

@@ -1,8 +1,8 @@
 import express from "express";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import { config } from "../config/config.js";
+import { config } from "../config.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
