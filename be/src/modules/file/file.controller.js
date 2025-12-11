@@ -81,30 +81,95 @@ export const getPublicFilesByUser = async (req, res) => {
 export const downloadFile = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    console.log(`Download request for file ID: ${id}`);
 
     const file = await fileService.getFileById(id);
 
     if (!file) {
-      return errorResponse(res, "File not found", 404);
+      console.log(`File with ID ${id} not found in database`);
+      res.status(404).json({ success: false, message: "File not found" });
+      return;
     }
+    
+    console.log(`File found: ${file.filename}, path: ${file.filepath}, visibility: ${file.visibility}`);
 
     if (file.visibility === "PRIVATE") {
       if (!req.user) {
-        return errorResponse(res, "Authentication required for private files", 401);
+        res.status(401).json({ success: false, message: "Authentication required for private files" });
+        return;
       }
       if (file.userId !== req.user.id) {
-        return errorResponse(res, "Access denied to private file", 403);
+        res.status(403).json({ success: false, message: "Access denied to private file" });
+        return;
       }
     }
 
-    if (!fs.existsSync(file.filepath)) {
-      return errorResponse(res, "File not found on server", 404);
+    let filePath = path.resolve(file.filepath);
+    const uploadsDir = path.resolve(process.cwd(), "./uploads");
+    
+    if (!fs.existsSync(filePath)) {
+      const filenameFromPath = path.basename(file.filepath);
+      const alternativePath = path.join(uploadsDir, filenameFromPath);
+      
+      console.log(`File not found at original path: ${filePath}`);
+      console.log(`Trying alternative path: ${alternativePath}`);
+      console.log(`Stored filepath in DB: ${file.filepath}`);
+      console.log(`Uploads directory: ${uploadsDir}`);
+      
+      if (fs.existsSync(alternativePath)) {
+        filePath = alternativePath;
+        console.log(`Found file at alternative path: ${filePath}`);
+      } else {
+        try {
+          if (!fs.existsSync(uploadsDir)) {
+            console.error(`Uploads directory does not exist: ${uploadsDir}`);
+            res.status(404).json({ success: false, message: "File not found on server" });
+            return;
+          }
+          
+          const allFiles = fs.readdirSync(uploadsDir);
+          console.log(`Searching in uploads directory. Files found:`, allFiles);
+          
+          const matchingFile = allFiles.find(f => {
+            const dbFilename = filenameFromPath.split('-').slice(1).join('-');
+            return f.includes(dbFilename) || f === filenameFromPath || f.endsWith(filenameFromPath);
+          });
+          
+          if (matchingFile) {
+            filePath = path.join(uploadsDir, matchingFile);
+            console.log(`Found file with matching name: ${filePath}`);
+          } else {
+            console.error(`File not found. Original: ${filePath}, Alternative: ${alternativePath}`);
+            console.error(`Uploads directory contents:`, allFiles);
+            res.status(404).json({ success: false, message: "File not found on server" });
+            return;
+          }
+        } catch (dirError) {
+          console.error(`Error reading uploads directory:`, dirError);
+          res.status(404).json({ success: false, message: "File not found on server" });
+          return;
+        }
+      }
     }
 
-    res.download(file.filepath, file.filename);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.filename)}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+    
+    fileStream.on('error', (err) => {
+      console.error('File stream error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, message: "Error reading file" });
+      }
+    });
   } catch (error) {
     console.error("Download error:", error);
-    return errorResponse(res, "Download failed", 500);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: error.message || "Download failed" });
+    }
   }
 };
 

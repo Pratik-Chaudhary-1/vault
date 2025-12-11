@@ -24,18 +24,50 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
         responseType: "blob",
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", file.filename);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      if (response.status === 200 && response.data) {
+        const blob = response.data instanceof Blob ? response.data : new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", file.filename);
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (error) {
-      alert(
-        "Download failed: " + (error.response?.data?.message || "Unknown error")
-      );
+      console.error("Download error:", error);
+      let errorMessage = "Unknown error";
+      
+      if (error.response) {
+        if (error.response.data instanceof Blob) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const text = reader.result;
+              const json = JSON.parse(text);
+              errorMessage = json.message || json.error || "Download failed";
+              alert(`Download failed: ${errorMessage}`);
+            } catch (e) {
+              errorMessage = "Download failed";
+              alert(`Download failed: ${errorMessage}`);
+            }
+          };
+          reader.readAsText(error.response.data);
+          return;
+        } else {
+          errorMessage = error.response.data?.message || error.response.data?.error || "Download failed";
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(`Download failed: ${errorMessage}`);
     } finally {
       setDownloading(false);
     }

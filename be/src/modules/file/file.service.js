@@ -5,12 +5,18 @@ import { config } from "../../config/env.js";
 
 export const uploadFile = async (file, userId, visibility) => {
   const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
-  const uniqueFilename = `${Date.now()}-${sanitizedFilename}`;
-  const filepath = path.join(process.cwd(), config.uploadsDir, uniqueFilename);
-
-  const uploadsDir = path.join(process.cwd(), config.uploadsDir);
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+  
+  const filepath = path.resolve(file.path);
+  
+  if (!fs.existsSync(filepath)) {
+    console.error(`Uploaded file not found at: ${filepath}`);
+    console.error(`Multer file object:`, {
+      filename: file.filename,
+      originalname: file.originalname,
+      path: file.path,
+      destination: file.destination
+    });
+    throw new Error(`Uploaded file not found on disk at: ${filepath}`);
   }
 
   const fileRecord = await prisma.file.create({
@@ -80,16 +86,23 @@ export const getAllPublicFiles = async () => {
 };
 
 export const getFileById = async (fileId) => {
-  return await prisma.file.findUnique({
-    where: { id: fileId },
-    include: {
-      user: {
-        select: {
-          username: true,
+  try {
+    const file = await prisma.file.findUnique({
+      where: { id: fileId },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
         },
       },
-    },
-  });
+    });
+    console.log(`getFileById query for ${fileId}:`, file ? `Found - ${file.filename}` : "Not found");
+    return file;
+  } catch (error) {
+    console.error(`Error in getFileById for ${fileId}:`, error);
+    throw error;
+  }
 };
 
 export const deleteFile = async (fileId, userId) => {

@@ -48,11 +48,14 @@ router.post("/upload", authenticateToken, upload.single("file"), fileController.
 
 router.get("/all", authenticateToken, fileController.getAllFiles);
 
+router.get("/download/:id", optionalAuthenticate, (req, res, next) => {
+  console.log(`Download route hit for ID: ${req.params.id}, URL: ${req.url}`);
+  next();
+}, fileController.downloadFile);
+
 router.get("/public/:userId", fileController.getPublicFilesByUser);
 
 router.get("/public", fileController.getAllPublicFiles);
-
-router.get("/download/:id", optionalAuthenticate, fileController.downloadFile);
 
 router.delete("/:id", authenticateToken, fileController.deleteFile);
 
