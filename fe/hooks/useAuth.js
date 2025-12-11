@@ -9,25 +9,24 @@ export const useAuth = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
     const username = localStorage.getItem("username");
 
     if (token) {
-      setUser({ token, role, username });
+      setUser({ token, username });
     }
     setLoading(false);
   }, []);
 
-  const login = useCallback((token, role, username) => {
+  const login = useCallback((token, username) => {
     localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-    localStorage.setItem("username", username);
-    setUser({ token, role, username });
+    if (username) {
+      localStorage.setItem("username", username);
+    }
+    setUser({ token, username });
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
     localStorage.removeItem("username");
     setUser(null);
     navigate("/");

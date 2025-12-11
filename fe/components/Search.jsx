@@ -15,8 +15,9 @@ const SearchUser = () => {
 
     setLoading(true);
     try {
-      const response = await apiClient.get(`/users?search=${query}`);
-      setResults(response.data);
+      const response = await apiClient.get(`/user/search?query=${query}`);
+      const usersData = response.data.data?.users || response.data.users || [];
+      setResults(usersData);
     } catch (error) {
       console.error("Search failed:", error);
       setResults([]);
@@ -68,11 +69,11 @@ const SearchUser = () => {
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <span className="font-medium text-gray-800">
-                  {user.username}
+                  {user.name || user.username}
                 </span>
               </div>
               <button
-                onClick={() => handleViewVault(user.username)}
+                onClick={() => handleViewVault(user.id)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 View Vault

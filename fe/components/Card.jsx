@@ -20,7 +20,7 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
   const handleDownload = async () => {
     setDownloading(true);
     try {
-      const response = await apiClient.get(`/files/${file.id}/download`, {
+      const response = await apiClient.get(`/file/download/${file.id}`, {
         responseType: "blob",
       });
 
@@ -34,7 +34,7 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       alert(
-        "Download failed: " + (error.response?.data?.error || "Unknown error")
+        "Download failed: " + (error.response?.data?.message || "Unknown error")
       );
     } finally {
       setDownloading(false);
@@ -57,7 +57,7 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
           </h3>
         </div>
         <div className="flex items-center gap-1">
-          {file.privacy === "private" ? (
+          {file.visibility === "PRIVATE" ? (
             <Lock className="w-4 h-4 text-red-600" />
           ) : (
             <Unlock className="w-4 h-4 text-green-600" />
@@ -67,8 +67,8 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
 
       <div className="space-y-1 mb-4 text-sm text-gray-600">
         <p>Size: {formatSize(file.size)}</p>
-        <p>Uploaded: {formatDate(file.uploadedAt)}</p>
-        <p>By: {file.uploadedBy}</p>
+        <p>Uploaded: {formatDate(file.createdAt || file.uploadedAt)}</p>
+        {file.user?.username && <p>By: {file.user.username}</p>}
       </div>
 
       <div className="flex gap-2">
@@ -81,7 +81,7 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
           <span>{downloading ? "Downloading..." : "Download"}</span>
         </button>
 
-        {showDelete && file.isOwner && (
+        {showDelete && (
           <button
             onClick={handleDelete}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
