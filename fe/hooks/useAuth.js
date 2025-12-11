@@ -1,21 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../api/apiClient";
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
-
-    if (token) {
-      setUser({ token, username });
-    }
-    setLoading(false);
-  }, []);
+    return token ? { token, username } : null;
+  });
+  const navigate = useNavigate();
 
   const login = useCallback((token, username) => {
     localStorage.setItem("token", token);
@@ -32,5 +24,5 @@ export const useAuth = () => {
     navigate("/");
   }, [navigate]);
 
-  return { user, loading, login, logout };
+  return { user, login, logout };
 };

@@ -13,7 +13,6 @@ export const useFiles = (filter = "all") => {
       const response = await apiClient.get("/file/all");
       const filesData = response.data.data?.files || response.data.files || [];
       
-      // Filter files based on activeFilter
       let filteredFiles = filesData;
       if (filter !== "all") {
         filteredFiles = filesData.filter(

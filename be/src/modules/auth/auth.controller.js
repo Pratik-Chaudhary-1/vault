@@ -2,11 +2,6 @@ import { z } from "zod";
 import { successResponse, errorResponse } from "../../utils/responses.js";
 import * as authService from "./auth.service.js";
 
-/**
- * Auth Controller - Handles HTTP requests/responses
- */
-
-// Validation schemas
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email format"),
@@ -19,15 +14,10 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-/**
- * Register a new user
- */
 export const register = async (req, res) => {
   try {
-    // Validate input
     const validatedData = registerSchema.parse(req.body);
 
-    // Register user
     const user = await authService.registerUser(validatedData);
 
     return successResponse(
@@ -48,15 +38,10 @@ export const register = async (req, res) => {
   }
 };
 
-/**
- * Login user
- */
 export const login = async (req, res) => {
   try {
-    // Validate input
     const validatedData = loginSchema.parse(req.body);
 
-    // Login user
     const result = await authService.loginUser(
       validatedData.email,
       validatedData.password

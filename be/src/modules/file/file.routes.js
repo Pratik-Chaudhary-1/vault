@@ -8,7 +8,6 @@ import * as fileController from "./file.controller.js";
 
 const router = express.Router();
 
-// Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadsDir = path.join(process.cwd(), config.uploadsDir);
@@ -21,7 +20,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter for allowed types
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     "application/pdf",
@@ -38,31 +36,24 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
 const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: config.maxFileSize, // 20MB
+    fileSize: config.maxFileSize,
   },
 });
 
-// POST /api/file/upload - Upload file (auth required)
 router.post("/upload", authenticateToken, upload.single("file"), fileController.uploadFile);
 
-// GET /api/file/all - Get all user's files (auth required)
 router.get("/all", authenticateToken, fileController.getAllFiles);
 
-// GET /api/file/public/:userId - Get public files for a user (must come before /public)
 router.get("/public/:userId", fileController.getPublicFilesByUser);
 
-// GET /api/file/public - Get all public files
 router.get("/public", fileController.getAllPublicFiles);
 
-// GET /api/file/download/:id - Download file (auth optional for public files)
 router.get("/download/:id", optionalAuthenticate, fileController.downloadFile);
 
-// DELETE /api/file/:id - Delete file (auth required, owner only)
 router.delete("/:id", authenticateToken, fileController.deleteFile);
 
 export default router;

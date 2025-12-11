@@ -17,11 +17,9 @@ const Vault = () => {
       setLoading(true);
       setError("");
       try {
-        // First get user by username/id
         const userResponse = await apiClient.get(`/user/${username}`);
         const userId = userResponse.data.data?.user?.id || username;
         
-        // Then get public files for that user
         const filesResponse = await apiClient.get(`/file/public/${userId}`);
         const filesData = filesResponse.data.data?.files || filesResponse.data.files || [];
         setFiles(filesData);

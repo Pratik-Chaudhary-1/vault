@@ -1,14 +1,6 @@
 import { successResponse, errorResponse } from "../../utils/responses.js";
 import * as userService from "./user.service.js";
 
-/**
- * User Controller - Handles HTTP requests/responses
- */
-
-/**
- * Search users by username or email
- * GET /api/user/search?query=<text>
- */
 export const searchUsers = async (req, res) => {
   try {
     const { query } = req.query;
@@ -26,9 +18,6 @@ export const searchUsers = async (req, res) => {
   }
 };
 
-/**
- * Get user by ID (public profile)
- */
 export const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;

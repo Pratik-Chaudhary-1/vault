@@ -4,32 +4,22 @@ import * as fileService from "./file.service.js";
 import fs from "fs";
 import path from "path";
 
-/**
- * File Controller - Handles HTTP requests/responses
- */
-
-// Validation schema
 const uploadSchema = z.object({
   visibility: z.enum(["PUBLIC", "PRIVATE"]).optional(),
 });
 
-/**
- * Upload file
- */
 export const uploadFile = async (req, res) => {
   try {
     if (!req.file) {
       return errorResponse(res, "No file uploaded", 400);
     }
 
-    // Validate visibility if provided
     let visibility = "PUBLIC";
     if (req.body.visibility) {
       const validated = uploadSchema.parse({ visibility: req.body.visibility });
       visibility = validated.visibility;
     }
 
-    // Upload file
     const fileRecord = await fileService.uploadFile(
       req.file,
       req.user.id,
@@ -57,9 +47,6 @@ export const uploadFile = async (req, res) => {
   }
 };
 
-/**
- * Get all files for logged-in user
- */
 export const getAllFiles = async (req, res) => {
   try {
     const files = await fileService.getUserFiles(req.user.id);
@@ -70,9 +57,6 @@ export const getAllFiles = async (req, res) => {
   }
 };
 
-/**
- * Get all public files
- */
 export const getAllPublicFiles = async (req, res) => {
   try {
     const files = await fileService.getAllPublicFiles();
@@ -83,9 +67,6 @@ export const getAllPublicFiles = async (req, res) => {
   }
 };
 
-/**
- * Get public files for a specific user
- */
 export const getPublicFilesByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -97,11 +78,6 @@ export const getPublicFilesByUser = async (req, res) => {
   }
 };
 
-/**
- * Download file
- * Public files can be downloaded without auth
- * Private files require auth and ownership
- */
 export const downloadFile = async (req, res) => {
   try {
     const { id } = req.params;
@@ -112,9 +88,7 @@ export const downloadFile = async (req, res) => {
       return errorResponse(res, "File not found", 404);
     }
 
-    // Check permissions for private files
     if (file.visibility === "PRIVATE") {
-      // Only owner can download private files
       if (!req.user) {
         return errorResponse(res, "Authentication required for private files", 401);
       }
@@ -123,12 +97,10 @@ export const downloadFile = async (req, res) => {
       }
     }
 
-    // Check if file exists on filesystem
     if (!fs.existsSync(file.filepath)) {
       return errorResponse(res, "File not found on server", 404);
     }
 
-    // Send file
     res.download(file.filepath, file.filename);
   } catch (error) {
     console.error("Download error:", error);
@@ -136,9 +108,6 @@ export const downloadFile = async (req, res) => {
   }
 };
 
-/**
- * Delete file
- */
 export const deleteFile = async (req, res) => {
   try {
     const { id } = req.params;

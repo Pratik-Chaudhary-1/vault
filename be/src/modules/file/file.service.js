@@ -3,26 +3,16 @@ import path from "path";
 import fs from "fs";
 import { config } from "../../config/env.js";
 
-/**
- * File Service - Business logic for file operations
- */
-
-/**
- * Upload file and save to database
- */
 export const uploadFile = async (file, userId, visibility) => {
-  // Sanitize filename
   const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
   const uniqueFilename = `${Date.now()}-${sanitizedFilename}`;
   const filepath = path.join(process.cwd(), config.uploadsDir, uniqueFilename);
 
-  // Ensure uploads directory exists
   const uploadsDir = path.join(process.cwd(), config.uploadsDir);
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
-  // Save file record to database
   const fileRecord = await prisma.file.create({
     data: {
       filename: sanitizedFilename,
@@ -44,9 +34,6 @@ export const uploadFile = async (file, userId, visibility) => {
   return fileRecord;
 };
 
-/**
- * Get all files for a user
- */
 export const getUserFiles = async (userId) => {
   return await prisma.file.findMany({
     where: { userId },
@@ -61,9 +48,6 @@ export const getUserFiles = async (userId) => {
   });
 };
 
-/**
- * Get public files for a specific user
- */
 export const getPublicFilesByUser = async (userId) => {
   return await prisma.file.findMany({
     where: {
@@ -81,9 +65,6 @@ export const getPublicFilesByUser = async (userId) => {
   });
 };
 
-/**
- * Get all public files
- */
 export const getAllPublicFiles = async () => {
   return await prisma.file.findMany({
     where: { visibility: "PUBLIC" },
@@ -98,9 +79,6 @@ export const getAllPublicFiles = async () => {
   });
 };
 
-/**
- * Get file by ID
- */
 export const getFileById = async (fileId) => {
   return await prisma.file.findUnique({
     where: { id: fileId },
@@ -114,11 +92,7 @@ export const getFileById = async (fileId) => {
   });
 };
 
-/**
- * Delete file from database and filesystem
- */
 export const deleteFile = async (fileId, userId) => {
-  // Get file to check ownership
   const file = await prisma.file.findUnique({
     where: { id: fileId },
   });
@@ -131,12 +105,10 @@ export const deleteFile = async (fileId, userId) => {
     throw new Error("You can only delete your own files");
   }
 
-  // Delete from filesystem
   if (fs.existsSync(file.filepath)) {
     fs.unlinkSync(file.filepath);
   }
 
-  // Delete from database
   await prisma.file.delete({
     where: { id: fileId },
   });

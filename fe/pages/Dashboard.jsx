@@ -24,7 +24,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Navbar />
 
       <div className="flex">
@@ -37,19 +37,19 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 capitalize">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent capitalize">
                   {activeFilter === "all"
                     ? "All Files"
                     : `${activeFilter} Files`}
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 mt-2 font-medium">
                   Manage and organize your files
                 </p>
               </div>
 
               <button
                 onClick={() => setIsUploadModalOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg font-medium"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl font-semibold transform hover:scale-105"
               >
                 <Plus className="w-5 h-5" />
                 Add Content
@@ -57,7 +57,7 @@ const Dashboard = () => {
             </div>
 
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+              <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 font-medium">
                 {error}
               </div>
             )}
@@ -68,13 +68,15 @@ const Dashboard = () => {
               </div>
             ) : files.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-gray-600 text-lg mb-4">No files found</p>
-                <button
-                  onClick={() => setIsUploadModalOpen(true)}
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  Upload your first file
-                </button>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-gray-200 max-w-md mx-auto">
+                  <p className="text-gray-600 text-lg mb-4 font-medium">No files found</p>
+                  <button
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+                  >
+                    Upload your first file
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

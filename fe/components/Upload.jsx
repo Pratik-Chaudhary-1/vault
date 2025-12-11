@@ -75,75 +75,74 @@ const FileUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="card-dark max-w-md w-full p-6 shadow-dark-xl">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-dark-text-primary flex items-center gap-2">
-            <div className="p-2 bg-gradient-accent rounded-lg">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl border border-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
               <Upload className="w-5 h-5 text-white" />
             </div>
             Upload File
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-dark-bg-hover rounded-lg transition-colors text-dark-text-secondary hover:text-dark-text-primary"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {error && (
-          <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-dark-text-primary mb-2 font-medium">
+            <label className="block text-gray-700 mb-2 font-semibold">
               Select File (PDF, MP4, JPG, PNG, TXT - max 20MB)
             </label>
             <input
               type="file"
               accept=".pdf,.mp4,.jpg,.jpeg,.png,.txt"
               onChange={handleFileChange}
-              className="input-dark file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-dark-accent-primary file:text-white hover:file:bg-dark-accent-hover file:cursor-pointer"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-blue-500 file:to-indigo-600 file:text-white hover:file:from-blue-600 hover:file:to-indigo-700 file:cursor-pointer"
               required
             />
             {file && (
-              <p className="text-sm text-dark-text-secondary mt-2">
-                Selected: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}{" "}
-                MB)
+              <p className="text-sm text-gray-600 mt-2 font-medium">
+                Selected: <span className="text-blue-600">{file.name}</span> ({(file.size / (1024 * 1024)).toFixed(2)} MB)
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-dark-text-primary mb-2 font-medium">
+            <label className="block text-gray-700 mb-3 font-semibold">
               Privacy Setting
             </label>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer p-3 rounded-lg border border-dark-border-primary hover:bg-dark-bg-hover transition-colors">
+              <label className="flex items-center gap-2 cursor-pointer p-4 rounded-xl border-2 border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all flex-1">
                 <input
                   type="radio"
                   value="PUBLIC"
                   checked={visibility === "PUBLIC"}
                   onChange={(e) => setVisibility(e.target.value)}
-                  className="w-4 h-4 text-dark-accent-primary"
+                  className="w-4 h-4 text-green-500 focus:ring-green-500"
                 />
-                <Unlock className="w-4 h-4 text-green-400" />
-                <span className="text-dark-text-primary">Public</span>
+                <Unlock className="w-5 h-5 text-green-500" />
+                <span className="text-gray-700 font-medium">Public</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer p-3 rounded-lg border border-dark-border-primary hover:bg-dark-bg-hover transition-colors">
+              <label className="flex items-center gap-2 cursor-pointer p-4 rounded-xl border-2 border-gray-200 hover:border-red-400 hover:bg-red-50 transition-all flex-1">
                 <input
                   type="radio"
                   value="PRIVATE"
                   checked={visibility === "PRIVATE"}
                   onChange={(e) => setVisibility(e.target.value)}
-                  className="w-4 h-4 text-dark-accent-primary"
+                  className="w-4 h-4 text-red-500 focus:ring-red-500"
                 />
-                <Lock className="w-4 h-4 text-red-400" />
-                <span className="text-dark-text-primary">Private</span>
+                <Lock className="w-5 h-5 text-red-500" />
+                <span className="text-gray-700 font-medium">Private</span>
               </label>
             </div>
           </div>
@@ -152,14 +151,14 @@ const FileUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-dark-border-primary text-dark-text-primary rounded-lg hover:bg-dark-bg-hover transition-all duration-200 font-medium"
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading || !file}
-              className="btn-primary flex-1 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
             >
               {uploading ? "Uploading..." : "Upload"}
             </button>

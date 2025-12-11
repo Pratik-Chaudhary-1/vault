@@ -48,34 +48,40 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition">
-      <div className="flex items-start justify-between mb-3">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-5 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+      <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2 flex-1">
-          <FileText className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+            <FileText className="w-4 h-4 text-white flex-shrink-0" />
+          </div>
           <h3 className="font-semibold text-gray-800 truncate">
             {file.filename}
           </h3>
         </div>
         <div className="flex items-center gap-1">
           {file.visibility === "PRIVATE" ? (
-            <Lock className="w-4 h-4 text-red-600" />
+            <div className="p-1.5 bg-red-100 rounded-lg">
+              <Lock className="w-4 h-4 text-red-600" />
+            </div>
           ) : (
-            <Unlock className="w-4 h-4 text-green-600" />
+            <div className="p-1.5 bg-green-100 rounded-lg">
+              <Unlock className="w-4 h-4 text-green-600" />
+            </div>
           )}
         </div>
       </div>
 
-      <div className="space-y-1 mb-4 text-sm text-gray-600">
-        <p>Size: {formatSize(file.size)}</p>
-        <p>Uploaded: {formatDate(file.createdAt || file.uploadedAt)}</p>
-        {file.user?.username && <p>By: {file.user.username}</p>}
+      <div className="space-y-1.5 mb-4 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+        <p className="font-medium">Size: <span className="text-gray-800">{formatSize(file.size)}</span></p>
+        <p className="font-medium">Uploaded: <span className="text-gray-800">{formatDate(file.createdAt || file.uploadedAt)}</span></p>
+        {file.user?.username && <p className="font-medium">By: <span className="text-gray-800">{file.user.username}</span></p>}
       </div>
 
       <div className="flex gap-2">
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all disabled:opacity-50 shadow-lg hover:shadow-xl font-semibold"
         >
           <Download className="w-4 h-4" />
           <span>{downloading ? "Downloading..." : "Download"}</span>
@@ -84,7 +90,7 @@ const FileCard = ({ file, onDelete, showDelete = true }) => {
         {showDelete && (
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+            className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-lg hover:shadow-xl"
           >
             <Trash2 className="w-4 h-4" />
           </button>
