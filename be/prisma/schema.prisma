@@ -14,24 +14,28 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  files     File[]
+  id          String   @id @default(uuid())
+  name        String
+  username    String   @unique
+  email       String   @unique
+  passwordHash String
+  createdAt   DateTime @default(now())
+  files       File[]
+
+  @@index([email])
+  @@index([username])
 }
 
 model File {
   id         String   @id @default(uuid())
+  userId     String
   filename   String
-  path       String
+  filepath   String
   size       Int
-  privacy    String   @default("public")
-  uploadedBy String
-  uploadedAt DateTime @default(now())
-  user       User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  visibility String   @default("PUBLIC") // "PUBLIC" | "PRIVATE"
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([uploadedBy])
-  @@index([privacy])
+  @@index([userId])
+  @@index([visibility])
 }
